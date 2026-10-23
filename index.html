@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyTracker — AI-Ready Career Plan (2026–2027)</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Mobile Hamburger -->
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation menu">
+    ☰
+  </button>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <h1>📚 StudyTracker</h1>
+      <p>TCS → Product Engineer (2026–27)</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-page="dashboard">
+        <span class="nav-icon">🏠</span>
+        <span>Dashboard</span>
+      </div>
+      <div class="nav-item" data-page="weekly">
+        <span class="nav-icon">📅</span>
+        <span>Weekly Plan</span>
+      </div>
+      <div class="nav-item" data-page="progress">
+        <span class="nav-icon">📊</span>
+        <span>Progress & Stats</span>
+      </div>
+      <div class="nav-item" data-page="milestones">
+        <span class="nav-icon">🎯</span>
+        <span>Milestones</span>
+      </div>
+      <div class="nav-item" data-page="schedule">
+        <span class="nav-icon">🗓️</span>
+        <span>14h Schedule</span>
+      </div>
+      <div class="nav-item" data-page="projects">
+        <span class="nav-icon">🚀</span>
+        <span>Projects</span>
+      </div>
+      <div class="nav-item" data-page="notes">
+        <span class="nav-icon">📝</span>
+        <span>Weekly Journal</span>
+      </div>
+      <div class="nav-item" data-page="settings">
+        <span class="nav-icon">⚙️</span>
+        <span>Settings</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="theme-toggle" id="themeToggleBtn">
+        <span id="themeToggleText">🌙 Dark Mode</span>
+        <span id="themeToggleIcon">⚡</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content" id="mainContent">
+
+    <!-- DASHBOARD PAGE -->
+    <section class="page active" id="dashboard">
+      <div class="page-header flex" style="justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h1>Welcome back, Jayasuriya 👋</h1>
+          <p class="subtitle" id="dashboardSubtitle">Target: ₹30–40 LPA · AI-Augmented Software Engineer → Secure Product Engineer</p>
+        </div>
+        <div class="flex gap-1" style="align-items: center;">
+          <span class="category-badge badge-career" style="font-size: 0.8rem; padding: 0.35rem 0.8rem;">WCAS (Java & Flutter) → Flagship AI</span>
+        </div>
+      </div>
+
+      <!-- Quick Metrics -->
+      <div class="dashboard-grid">
+        <div class="stat-card accent-blue">
+          <div class="stat-icon">📅</div>
+          <div class="stat-value" id="dashWeekNum">Week 1</div>
+          <div class="stat-label">Current Roadmap Week</div>
+        </div>
+        <div class="stat-card accent-purple">
+          <div class="stat-icon">🌱</div>
+          <div class="stat-value" id="dashPhaseName" style="font-size: 1.25rem;">Phase A</div>
+          <div class="stat-label">Current Phase</div>
+        </div>
+        <div class="stat-card accent-green">
+          <div class="stat-icon">✅</div>
+          <div class="stat-value" id="dashTasksCompleted">0 / 260</div>
+          <div class="stat-label">Tasks Completed</div>
+        </div>
+        <div class="stat-card accent-orange">
+          <div class="stat-icon">🧩</div>
+          <div class="stat-value" id="dashDsaSolved">0</div>
+          <div class="stat-label">DSA Solved (Goal: 160)</div>
+        </div>
+        <div class="stat-card accent-cyan">
+          <div class="stat-icon">⏱️</div>
+          <div class="stat-value" id="dashWeeklyHours">14h</div>
+          <div class="stat-label">Target Weekly Pace</div>
+        </div>
+        <div class="stat-card accent-red">
+          <div class="stat-icon">🔥</div>
+          <div class="stat-value" id="dashStreak">1 Day</div>
+          <div class="stat-label">Active Streak</div>
+        </div>
+      </div>
+
+      <!-- Phase Roadmap Timeline -->
+      <div class="card mb-3">
+        <div class="card-header">
+          <h3>🗺️ 52-Week Roadmap Phases</h3>
+          <span class="text-muted" style="font-size: 0.85rem;" id="overallPercentText">0% Complete</span>
+        </div>
+        <div class="progress-bar mb-2">
+          <div class="progress-fill green" id="dashOverallBar" style="width: 0%;"></div>
+        </div>
+        <div class="phase-timeline" id="dashPhaseTimeline">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Two Column Layout: Current Week Focus & Quick Tasks -->
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <h3 id="currentWeekFocusTitle">🎯 Week Focus</h3>
+            <button class="btn btn-secondary btn-sm" id="jumpToWeeklyBtn">View Full Week →</button>
+          </div>
+          <div class="week-info" style="grid-template-columns: 1fr; margin-bottom: 0;">
+            <div class="info-block">
+              <h4>⚙️ Software Engineering & DSA</h4>
+              <p id="dashEngFocus" class="fw-600">Assess Java skills, Big-O and arrays</p>
+            </div>
+            <div class="info-block" style="margin-top: 0.75rem;">
+              <h4>🤖 AI-Readiness & Security Deliverable</h4>
+              <p id="dashAiFocus" class="fw-600">Establish a safe AI-assisted coding workflow and baseline test</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>⚡ This Week's Checklist</h3>
+            <span class="category-badge badge-dsa" id="weekProgressBadge">0% done</span>
+          </div>
+          <div class="task-list" id="dashQuickTaskList">
+            <!-- Dynamic task checklist -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Summary Chart -->
+      <div class="chart-container">
+        <div class="card-header">
+          <h3>📈 Roadmap Progress Overview</h3>
+          <span class="text-muted" style="font-size: 0.85rem;">Completion by Phase</span>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="progressChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- WEEKLY PLAN PAGE -->
+    <section class="page" id="weekly">
+      <div class="page-header">
+        <h1>📅 52-Week Step-by-Step Curriculum</h1>
+        <p class="subtitle">Actionable deliverables for every week from Nov 2026 to Oct 2027</p>
+      </div>
+
+      <div class="week-selector">
+        <button id="prevWeekBtn" aria-label="Previous week">← Prev</button>
+        <select id="weekDropdown" style="padding: 0.5rem 1rem; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font-main); font-weight: 600; cursor: pointer;">
+          <!-- Options dynamically populated 1 to 52 -->
+        </select>
+        <button id="nextWeekBtn" aria-label="Next week">Next →</button>
+        <button class="btn btn-secondary btn-sm" id="jumpToCurrentWeekBtn">Jump to Current</button>
+      </div>
+
+      <div class="week-info" id="weeklyInfoCard">
+        <div class="info-block">
+          <div class="flex gap-1" style="align-items: center; margin-bottom: 0.4rem;">
+            <span class="category-badge badge-java" id="weeklyPhaseBadge">Phase A</span>
+            <span class="text-muted" id="weeklyDateRange" style="font-size: 0.8rem;">Nov 2 - Nov 8, 2026</span>
+          </div>
+          <h4>⚙️ Engineering & Fundamentals Focus</h4>
+          <p id="weeklyEngFocus" class="fw-600" style="font-size: 1rem;">Assess Java skills, Big-O and arrays</p>
+        </div>
+        <div class="info-block">
+          <h4>🤖 AI-Readiness & Practical Deliverable</h4>
+          <p id="weeklyAiFocus" class="fw-600" style="font-size: 1rem;">Establish a safe AI-assisted coding workflow</p>
+          <div class="progress-bar mt-2">
+            <div class="progress-fill green" id="weeklyProgressBar" style="width: 0%;"></div>
+          </div>
+          <div class="flex" style="justify-content: space-between; font-size: 0.8rem; margin-top: 0.25rem;">
+            <span class="text-muted" id="weeklyTaskCountText">0/5 tasks completed</span>
+            <span class="fw-600" id="weeklyTaskPercentText">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-header">
+          <h3>✅ Weekly Action Items</h3>
+          <button class="btn btn-primary btn-sm" id="openAddTaskModalBtn">+ Add Custom Task</button>
+        </div>
+        <div class="task-list" id="weeklyTaskList">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Quick reflection for the week -->
+      <div class="card">
+        <div class="card-header">
+          <h3>📝 Notes & AI Verification Log for this Week</h3>
+          <button class="btn btn-success btn-sm" id="saveWeeklyNotesBtn">Save Week Notes</button>
+        </div>
+        <div class="notes-form">
+          <div class="note-field">
+            <label>What did you study / implement this week?</label>
+            <textarea id="weekLearnedNote" placeholder="e.g., Practiced binary search boundaries, set up JUnit Mockito tests..."></textarea>
+          </div>
+          <div class="note-field">
+            <label>AI Verification: What did AI get right or wrong? How did you verify it?</label>
+            <textarea id="weekAiNote" placeholder="e.g., Copilot missed the duplicate elements corner-case in binary search. I wrote a unit test to prove it..."></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROGRESS & STATS PAGE -->
+    <section class="page" id="progress">
+      <div class="page-header">
+        <h1>📊 Your Progress & Mastery Metrics</h1>
+        <p class="subtitle">Track your DSA counts, skill domains, and velocity toward the ₹30–40 LPA target</p>
+      </div>
+
+      <!-- Overall progress banner -->
+      <div class="overall-progress">
+        <div class="progress-subtitle">TOTAL ROADMAP COMPLETION</div>
+        <div class="big-percent" id="statsOverallPercent">0%</div>
+        <div class="progress-bar" style="max-width: 500px; margin: 1rem auto;">
+          <div class="progress-fill green" id="statsOverallFill" style="width: 0%;"></div>
+        </div>
+        <p class="text-muted" id="statsTasksRemaining">0 of 260 planned tasks completed</p>
+      </div>
+
+      <!-- DSA Tracker Counter -->
+      <div class="dsa-counter">
+        <div class="count" id="dsaProblemDisplay">0</div>
+        <div style="flex: 1;">
+          <div class="fw-600" style="font-size: 1.1rem;">LeetCode / DSA Problems Mastered</div>
+          <div class="counter-label">Target: 120–160 problems across arrays, trees, graphs, DP & system patterns.</div>
+          <div class="progress-bar mt-1" style="height: 6px;">
+            <div class="progress-fill" id="dsaProgressBar" style="width: 0%;"></div>
+          </div>
+        </div>
+        <div class="counter-controls">
+          <button class="btn btn-secondary btn-sm" id="dsaDecBtn">-1</button>
+          <button class="btn btn-primary btn-sm" id="dsaIncBtn">+1</button>
+          <button class="btn btn-primary btn-sm" id="dsaInc5Btn">+5</button>
+        </div>
+      </div>
+
+      <!-- 4 Skill Tracks -->
+      <h3 class="mb-2">🎯 Four Pillars of Preparation</h3>
+      <div class="skill-tracks" id="skillTracksContainer">
+        <!-- Dynamic skill cards -->
+      </div>
+
+      <!-- Charts Grid -->
+      <div class="charts-grid">
+        <div class="chart-container">
+          <h3>Category Distribution of Completed Tasks</h3>
+          <div class="chart-wrapper">
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-container">
+          <h3>Phase Completion Rates</h3>
+          <div class="chart-wrapper">
+            <canvas id="weeklyProgressChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MILESTONES PAGE -->
+    <section class="page" id="milestones">
+      <div class="page-header">
+        <h1>🎯 Bi-Monthly Milestone Checkpoints</h1>
+        <p class="subtitle">6 critical milestones to confirm real engineering and AI fluency over 12 months</p>
+      </div>
+
+      <div class="milestones-grid" id="milestonesGrid">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- SCHEDULE PAGE -->
+    <section class="page" id="schedule">
+      <div class="page-header">
+        <h1>🗓️ 14-Hour Weekly Allocation Template</h1>
+        <p class="subtitle">Engineered to balance demanding TCS CBD-WCAS client work with rigorous preparation</p>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <table class="schedule-table">
+            <thead>
+              <tr>
+                <th>Day</th>
+                <th>Focus & Planned Tasks</th>
+                <th>Hours</th>
+              </tr>
+            </thead>
+            <tbody id="scheduleTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+            <tfoot>
+              <tr style="background: var(--bg-tertiary); font-weight: 700;">
+                <td style="padding: 0.75rem 1rem;">Total</td>
+                <td style="padding: 0.75rem 1rem;">Balanced Across DSA, Java, AI, Projects & Security</td>
+                <td style="padding: 0.75rem 1rem; font-family: var(--font-mono);">14.0 hrs/wk</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div>
+          <div class="chart-container" style="margin-bottom: 1.5rem;">
+            <h3>Time Allocation by Category</h3>
+            <div class="chart-wrapper" style="max-height: 250px;">
+              <canvas id="scheduleChart"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="mb-1">💡 Golden Rule from the Roadmap</h3>
+            <blockquote style="border-left: 3px solid var(--accent); padding-left: 1rem; color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+              "Don't compete with AI at generating code; learn to direct AI, verify its output, understand the system, and take responsibility for the result. You still need DSA, programming fundamentals and debugging skills because AI-generated code can be incorrect, insecure or inefficient."
+            </blockquote>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS PAGE -->
+    <section class="page" id="projects">
+      <div class="page-header">
+        <h1>🚀 Portfolio Projects</h1>
+        <p class="subtitle">3 tangible, demonstrable projects that set you apart from surface-level developers</p>
+      </div>
+
+      <div class="projects-grid" id="projectsGrid">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- NOTES / JOURNAL PAGE -->
+    <section class="page" id="notes">
+      <div class="page-header">
+        <h1>📝 Engineering & AI Verification Journal</h1>
+        <p class="subtitle">Document root causes, where AI hallucinated or excelled, and weekly technical reflections</p>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-header">
+          <div class="flex gap-1" style="align-items: center;">
+            <h3>Journal Entry for</h3>
+            <select id="journalWeekSelect" style="padding: 0.4rem 0.8rem; background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border); border-radius: var(--radius-xs);">
+              <!-- Weeks 1 to 52 -->
+            </select>
+          </div>
+          <button class="btn btn-primary btn-sm" id="saveJournalBtn">Save Entry</button>
+        </div>
+
+        <div class="notes-form">
+          <div class="note-field">
+            <label>1. Technical Learnings & Concepts Mastered</label>
+            <textarea id="journalLearned" placeholder="Key data structures, Spring Boot mechanisms, or database transactions learned..."></textarea>
+          </div>
+          <div class="note-field">
+            <label>2. AI-Assisted Verification Log (Crucial for Interviews!)</label>
+            <textarea id="journalAi" placeholder="Record where AI explanations or code were incorrect, edge cases missed, and how you proved the fix with tests..."></textarea>
+          </div>
+          <div class="note-field">
+            <label>3. Key Wins & Milestones This Week</label>
+            <textarea id="journalWins" placeholder="e.g., Solved 5 DP problems without hints, fixed complex JPA N+1 issue..."></textarea>
+          </div>
+          <div class="note-field">
+            <label>4. Weak Spots to Revisit</label>
+            <textarea id="journalImprove" placeholder="Areas requiring deeper revision (e.g., concurrency race conditions, tree diameter)..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="past-notes">
+        <h3 class="mb-2">📚 Past Journal Reflections</h3>
+        <div id="pastNotesList">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS PAGE -->
+    <section class="page" id="settings">
+      <div class="page-header">
+        <h1>⚙️ Preferences & Data Management</h1>
+        <p class="subtitle">Backup your progress, customize dates, or reset data</p>
+      </div>
+
+      <div class="settings-group">
+        <h3>🎨 Appearance & Roadmap Timeline</h3>
+        <div class="setting-row">
+          <div>
+            <label class="fw-600">Theme Mode</label>
+            <div class="text-muted" style="font-size: 0.8rem;">Switch between high-contrast Dark and Light themes</div>
+          </div>
+          <select id="settingThemeSelect" style="padding: 0.4rem 0.8rem; background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border); border-radius: var(--radius-xs);">
+            <option value="dark">Dark Theme (Default)</option>
+            <option value="light">Light Theme</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <div>
+            <label class="fw-600">Roadmap Start Date</label>
+            <div class="text-muted" style="font-size: 0.8rem;">Official plan kick-off date (Default: Nov 2, 2026)</div>
+          </div>
+          <input type="date" id="settingStartDate" value="2026-11-02">
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <h3>💾 Backup & Portability</h3>
+        <div class="setting-row">
+          <div>
+            <label class="fw-600">Export Progress Data</label>
+            <div class="text-muted" style="font-size: 0.8rem;">Download your tasks, notes, DSA counts, and milestones as a JSON file</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="exportDataBtn">📥 Export JSON</button>
+        </div>
+        <div class="setting-row">
+          <div>
+            <label class="fw-600">Import Progress Data</label>
+            <div class="text-muted" style="font-size: 0.8rem;">Restore progress from a previously exported backup</div>
+          </div>
+          <div>
+            <input type="file" id="importFileInput" accept=".json" style="display: none;">
+            <button class="btn btn-secondary btn-sm" id="importDataBtn">📤 Import Backup</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div>
+            <label class="fw-600" style="color: var(--danger);">Reset All Progress</label>
+            <div class="text-muted" style="font-size: 0.8rem;">Erase all saved state and restore clean plan defaults</div>
+          </div>
+          <button class="btn btn-danger btn-sm" id="resetDataBtn">⚠️ Reset Data</button>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <h3>🏢 Target Product Companies & Ambition</h3>
+        <p class="text-muted mb-2" style="font-size: 0.9rem;">
+          Primary Role Searches: <code>Software Engineer I</code> · <code>SDE-1</code> · <code>Java Backend Engineer</code> · <code>Full Stack Engineer</code> · <code>Product Engineer</code>
+        </p>
+        <div class="flex" style="flex-wrap: wrap; gap: 0.5rem;" id="targetCompaniesList">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Add Custom Task Modal -->
+  <div class="modal-overlay" id="taskModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Add Custom Task for Week <span id="modalWeekNum">1</span></h3>
+        <button class="modal-close" id="closeModalBtn">&times;</button>
+      </div>
+      <form id="addTaskForm">
+        <div class="form-group">
+          <label for="taskTextInput">Task Description</label>
+          <input type="text" id="taskTextInput" required placeholder="e.g., Review ThreadLocal memory leaks in Tomcat...">
+        </div>
+        <div class="form-group">
+          <label for="taskCategorySelect">Skill Category</label>
+          <select id="taskCategorySelect">
+            <option value="dsa">DSA & Problem Solving</option>
+            <option value="java">Java & Backend</option>
+            <option value="ai">AI Engineering</option>
+            <option value="security">Security & DevSecOps</option>
+            <option value="project">Portfolio Project</option>
+            <option value="career">Career & Interview Prep</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary btn-sm" id="cancelModalBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Add Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
