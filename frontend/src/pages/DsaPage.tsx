@@ -4,15 +4,9 @@ import { api } from '../services/api';
 import { useToast } from '../components/Toast';
 import { Modal } from '../components/Modal';
 import {
-  Code2,
   Plus,
-  Search,
   ExternalLink,
   RotateCcw,
-  CheckCircle2,
-  AlertCircle,
-  Clock,
-  Filter,
 } from 'lucide-react';
 import { Difficulty, DsaStatus } from '../types';
 

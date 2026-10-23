@@ -36,7 +36,7 @@ class AiAssistantTests {
     @Test
     @DisplayName("Verify deterministic mock AI provider with hints-first mode and verification notice")
     void testMockAiAssistant() {
-        AuthResponse auth = authService.register(new RegisterRequest(
+        AuthService.LoginResult auth = authService.register(new RegisterRequest(
                 "AI Learner", "ailearner", "ai@example.com", "password123",
                 "Asia/Kolkata", LocalDate.of(2026, 11, 2)
         ));

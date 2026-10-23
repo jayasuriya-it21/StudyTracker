@@ -26,8 +26,8 @@ public class Dtos {
     ) {}
 
     public record AuthResponse(
-            String token,
-            UserDto user
+            UserDto user,
+            String message
     ) {}
 
     public record UserDto(

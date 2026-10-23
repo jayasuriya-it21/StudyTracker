@@ -5,15 +5,10 @@ import { api } from '../services/api';
 import { useToast } from '../components/Toast';
 import { Modal } from '../components/Modal';
 import {
-  CheckSquare,
   Plus,
-  Filter,
   ArrowRight,
-  Clock,
-  AlertCircle,
-  Forward,
 } from 'lucide-react';
-import { TaskCategory, Priority, TaskStatus } from '../types';
+import type { TaskCategory, Priority } from '../types';
 
 export const TasksPage: React.FC = () => {
   const navigate = useNavigate();
@@ -33,7 +28,7 @@ export const TasksPage: React.FC = () => {
   const [priority, setPriority] = useState<Priority>('MEDIUM');
   const [estimateMinutes, setEstimateMinutes] = useState(60);
 
-  const { data: weeks, isLoading: loadingWeeks } = useQuery({
+  const { data: weeks } = useQuery({
     queryKey: ['weeks'],
     queryFn: api.getWeeks,
   });

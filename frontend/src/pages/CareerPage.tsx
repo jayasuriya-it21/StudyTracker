@@ -7,12 +7,7 @@ import {
   Briefcase,
   Plus,
   Target,
-  TrendingUp,
-  Building,
-  CheckCircle2,
-  Calendar,
   Award,
-  AlertCircle,
 } from 'lucide-react';
 import { ApplicationStatus } from '../types';
 
@@ -37,7 +32,7 @@ export const CareerPage: React.FC = () => {
   const [interviewer, setInterviewer] = useState('Pramp / Peer');
   const [rating, setRating] = useState(8);
   const [feedback, setFeedback] = useState('');
-  const [interviewDate, setInterviewDate] = useState(new Date().toISOString().split('T')[0]);
+  const [interviewDate, setInterviewDate] = useState(() => new Date().toISOString().split('T')[0]);
 
   const { data: applications, isLoading: loadingApps } = useQuery({
     queryKey: ['applications'],

@@ -22,7 +22,8 @@ public class DemoAccountInitializer implements ApplicationRunner {
     private final PasswordEncoder passwordEncoder;
     private final RoadmapService roadmapService;
 
-    @Value("${app.demo-account.enabled:true}")
+    // Disabled by default for production security
+    @Value("${app.demo-account.enabled:false}")
     private boolean enabled;
 
     @Value("${app.demo-account.name:Jayasuriya}")
@@ -34,7 +35,7 @@ public class DemoAccountInitializer implements ApplicationRunner {
     @Value("${app.demo-account.email:jayasuriya@example.com}")
     private String email;
 
-    @Value("${app.demo-account.password:password123}")
+    @Value("${app.demo-account.password:}")
     private String password;
 
     public DemoAccountInitializer(
@@ -48,10 +49,18 @@ public class DemoAccountInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        if (!enabled) return;
+        if (!enabled) {
+            log.info("Demo account auto-initialization is disabled (production-safe default).");
+            return;
+        }
+
+        if (password == null || password.isBlank()) {
+            log.warn("Demo account initialization skipped: DEMO_ACCOUNT_PASSWORD was not provided.");
+            return;
+        }
 
         if (userRepository.findByUsername(username).isEmpty()) {
-            log.info("Initializing demo account '{}' for development and testing...", username);
+            log.info("Initializing demo account '{}' for local development...", username);
             User user = new User();
             user.setName(name);
             user.setUsername(username);
@@ -62,7 +71,7 @@ public class DemoAccountInitializer implements ApplicationRunner {
             user = userRepository.save(user);
 
             roadmapService.initializeUserRoadmap(user);
-            log.info("Demo account initialized successfully with full 52-week roadmap!");
+            log.info("Demo account initialized successfully with 52-week curriculum roadmap.");
         }
     }
 }

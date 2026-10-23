@@ -1,10 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { UserDto, AuthResponse } from '../types';
+import type { UserDto } from '../types';
 import { api } from '../services/api';
 
 interface AuthContextType {
   user: UserDto | null;
-  token: string | null;
   loading: boolean;
   login: (credentials: any) => Promise<void>;
   register: (data: any) => Promise<void>;
@@ -16,52 +15,38 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserDto | null>(null);
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('studytracker_token'));
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadUser() {
-      if (token) {
-        try {
-          const u = await api.getMe();
-          setUser(u);
-        } catch (e) {
-          console.warn('Failed to restore session:', e);
-          localStorage.removeItem('studytracker_token');
-          setToken(null);
-          setUser(null);
-        }
+      try {
+        const u = await api.getMe();
+        setUser(u);
+      } catch {
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
     loadUser();
-  }, [token]);
-
-  const handleAuthSuccess = (res: AuthResponse) => {
-    localStorage.setItem('studytracker_token', res.token);
-    setToken(res.token);
-    setUser(res.user);
-  };
+  }, []);
 
   const login = async (credentials: any) => {
     const res = await api.login(credentials);
-    handleAuthSuccess(res);
+    setUser(res.user);
   };
 
   const register = async (data: any) => {
     const res = await api.register(data);
-    handleAuthSuccess(res);
+    setUser(res.user);
   };
 
   const logout = async () => {
     try {
       await api.logout();
-    } catch {
-      // ignore
+    } finally {
+      setUser(null);
     }
-    localStorage.removeItem('studytracker_token');
-    setToken(null);
-    setUser(null);
   };
 
   const updateUser = (updated: UserDto) => {
@@ -69,7 +54,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
@@ -77,6 +62,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within an AuthProvider');
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
   return context;
 };

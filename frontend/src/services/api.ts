@@ -1,4 +1,4 @@
-import {
+import type {
   AuthResponse,
   UserDto,
   RoadmapDto,
@@ -25,18 +25,14 @@ import {
 const BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const token = localStorage.getItem('studytracker_token');
   const headers = new Headers(options.headers || {});
   headers.set('Content-Type', 'application/json');
-
-  if (token) {
-    headers.set('Authorization', `Bearer ${token}`);
-  }
+  headers.set('X-Requested-With', 'XMLHttpRequest');
 
   const res = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,
     headers,
-    credentials: 'include', // Sends HTTP-only cookie automatically
+    credentials: 'include', // Automatically sends HTTP-only SameSite=Strict cookie
   });
 
   if (res.status === 204) {
@@ -47,7 +43,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     let errorMsg = 'An error occurred';
     try {
       const errJson = await res.json();
-      errorMsg = errJson.message || errJson.error || errorMsg;
+      errorMsg = errJson.message || errJson.error || errJson.detail || errorMsg;
     } catch {
       errorMsg = `HTTP Error ${res.status}: ${res.statusText}`;
     }
@@ -58,7 +54,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 }
 
 export const api = {
-  // Auth
+  // Auth (HTTP-Only Cookie based; no tokens in localStorage)
   register: (data: any) => request<AuthResponse>('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
   login: (data: any) => request<AuthResponse>('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
   logout: () => request<void>('/auth/logout', { method: 'POST' }),

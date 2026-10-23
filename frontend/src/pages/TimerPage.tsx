@@ -3,8 +3,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../services/api';
 import { useToast } from '../components/Toast';
 import { TimerWidget } from '../components/TimerWidget';
-import { Clock, Plus, Calendar, History, BarChart2 } from 'lucide-react';
-import { TaskCategory } from '../types';
+import { Clock, Plus, History } from 'lucide-react';
+import type { TaskCategory } from '../types';
 
 export const TimerPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -14,7 +14,7 @@ export const TimerPage: React.FC = () => {
   const [durationMinutes, setDurationMinutes] = useState(45);
   const [summary, setSummary] = useState('');
   const [interruptionNotes, setInterruptionNotes] = useState('');
-  const [sessionDate, setSessionDate] = useState(new Date().toISOString().split('T')[0]);
+  const [sessionDate, setSessionDate] = useState(() => new Date().toISOString().split('T')[0]);
 
   const { data: sessions, isLoading } = useQuery({
     queryKey: ['sessions'],

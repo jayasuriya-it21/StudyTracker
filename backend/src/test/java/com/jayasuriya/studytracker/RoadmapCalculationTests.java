@@ -38,7 +38,7 @@ class RoadmapCalculationTests {
     @Test
     @DisplayName("Verify roadmap contains exactly 52 weeks and starts Nov 2 2026 to Oct 31 2027")
     void testRoadmap52WeeksDates() {
-        AuthResponse auth = authService.register(new RegisterRequest(
+        AuthService.LoginResult auth = authService.register(new RegisterRequest(
                 "Test User", "testuser52", "test52@example.com", "password123",
                 "Asia/Kolkata", LocalDate.of(2026, 11, 2)
         ));
@@ -71,7 +71,7 @@ class RoadmapCalculationTests {
     @Test
     @DisplayName("Verify dashboard shows countdown before start date without marking week 1 completed")
     void testDashboardCountdownBeforeStart() {
-        AuthResponse auth = authService.register(new RegisterRequest(
+        AuthService.LoginResult auth = authService.register(new RegisterRequest(
                 "Future User", "futureuser", "future@example.com", "password123",
                 "Asia/Kolkata", LocalDate.of(2026, 11, 2)
         ));

@@ -4,15 +4,12 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useToast } from '../components/Toast';
 import { api } from '../services/api';
 import {
-  Settings,
   Download,
   Upload,
   User,
   Moon,
   Sun,
-  Shield,
   FileSpreadsheet,
-  CheckCircle2,
 } from 'lucide-react';
 
 export const SettingsPage: React.FC = () => {

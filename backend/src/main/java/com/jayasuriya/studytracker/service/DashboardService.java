@@ -50,16 +50,10 @@ public class DashboardService {
         LocalDate start = user.getRoadmapStartDate() != null ? user.getRoadmapStartDate() : LocalDate.of(2026, 11, 2);
         LocalDate today = LocalDate.now();
 
-        boolean isStarted = !today.isBefore(start);
-        long daysUntilStart = isStarted ? 0 : ChronoUnit.DAYS.between(today, start);
-
-        int currentWeekNum;
-        if (!isStarted) {
-            currentWeekNum = 1;
-        } else {
-            long diffDays = ChronoUnit.DAYS.between(start, today);
-            currentWeekNum = Math.min(Math.max((int) (diffDays / 7) + 1, 1), 52);
-        }
+        RoadmapTimelineCalculator.TimelineInfo timeline = RoadmapTimelineCalculator.calculate(start, today);
+        boolean isStarted = timeline.isStarted();
+        long daysUntilStart = timeline.daysUntilStart();
+        int currentWeekNum = isStarted ? timeline.currentWeekNumber() : 1;
 
         Roadmap roadmap = roadmapRepository.findByOwnerIdAndIsActiveTrue(user.getId()).orElse(null);
 

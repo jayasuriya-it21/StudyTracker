@@ -4,14 +4,10 @@ import { api } from '../services/api';
 import { useToast } from '../components/Toast';
 import { Modal } from '../components/Modal';
 import {
-  FolderKanban,
-  CheckCircle2,
   ExternalLink,
   GitBranch,
   Plus,
   Shield,
-  Layers,
-  Sparkles,
 } from 'lucide-react';
 
 export const ProjectsPage: React.FC = () => {

@@ -41,14 +41,14 @@ class AuthAndIsolationApiTests {
     @DisplayName("Verify strict ownership isolation: User B cannot access or modify User A's tasks")
     void testOwnershipIsolation() {
         // Register User A
-        AuthResponse authA = authService.register(new RegisterRequest(
+        AuthService.LoginResult authA = authService.register(new RegisterRequest(
                 "Alice", "alice", "alice@example.com", "password123",
                 "Asia/Kolkata", LocalDate.of(2026, 11, 2)
         ));
         User userA = userRepository.findById(authA.user().id()).orElseThrow();
 
         // Register User B
-        AuthResponse authB = authService.register(new RegisterRequest(
+        AuthService.LoginResult authB = authService.register(new RegisterRequest(
                 "Bob", "bob", "bob@example.com", "password123",
                 "Asia/Kolkata", LocalDate.of(2026, 11, 2)
         ));

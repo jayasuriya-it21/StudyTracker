@@ -48,8 +48,8 @@ export interface UserDto {
 }
 
 export interface AuthResponse {
-  token: string;
   user: UserDto;
+  message?: string;
 }
 
 export interface PhaseDto {

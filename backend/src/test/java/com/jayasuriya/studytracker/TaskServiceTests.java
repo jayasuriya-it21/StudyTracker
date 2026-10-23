@@ -41,7 +41,7 @@ class TaskServiceTests {
     @Test
     @DisplayName("Test task creation, toggle completion, and carry forward with audit trail")
     void testTaskLifecycleAndCarryForward() {
-        AuthResponse auth = authService.register(new RegisterRequest(
+        AuthService.LoginResult auth = authService.register(new RegisterRequest(
                 "Task Tester", "tasktester", "tasktester@example.com", "password123",
                 "Asia/Kolkata", LocalDate.of(2026, 11, 2)
         ));

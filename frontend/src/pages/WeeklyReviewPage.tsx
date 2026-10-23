@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
-import { useToast } from '../components/Toast';
-import { BookOpenCheck, CheckCircle2, Clock, Calendar, ArrowRight, Star } from 'lucide-react';
+import { BookOpenCheck, Clock, ArrowRight } from 'lucide-react';
 
 export const WeeklyReviewPage: React.FC = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const { showToast } = useToast();
-
   const [selectedWeekNum, setSelectedWeekNum] = useState<number>(1);
 
   const { data: weeks } = useQuery({

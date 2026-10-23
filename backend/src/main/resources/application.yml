@@ -1,29 +1,33 @@
 server:
-  port: ${PORT:8080}
+  port: ${SERVER_PORT:8080}
   servlet:
     context-path: /
 
 spring:
   application:
     name: studytracker-backend
+
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:studytracker}}
-    username: ${DB_USER:studytracker}
-    password: ${DB_PASSWORD:studytracker}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/studytracker}
+    username: ${SPRING_DATASOURCE_USERNAME:studyuser}
+    password: ${SPRING_DATASOURCE_PASSWORD:studypassword}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
       idle-timeout: 30000
       connection-timeout: 20000
+
   jpa:
-    open-in-view: false
     hibernate:
       ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: false
+    show-sql: false
+    open-in-view: false
+
   flyway:
     enabled: true
     baseline-on-migrate: true
@@ -37,21 +41,22 @@ management:
         include: health,info,metrics
   endpoint:
     health:
-      show-details: always
-      probes:
-        enabled: true
+      show-details: when_authorized
 
-# Security & JWT
+# Security & Application Settings
 app:
+  security:
+    cookie:
+      secure: ${COOKIE_SECURE:false}
   jwt:
-    secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
-    expiration-ms: 86400000
+    secret: ${JWT_SECRET:supersecretjwtkeywithatleast256bitsofentropyforsecurity!}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
   demo-account:
-    enabled: ${DEMO_ACCOUNT_ENABLED:true}
+    enabled: ${DEMO_ACCOUNT_ENABLED:false}
     name: Jayasuriya
     username: jayasuriya
     email: jayasuriya@example.com
-    password: password123
+    password: ${DEMO_ACCOUNT_PASSWORD:}
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173,http://127.0.0.1:3000}
 

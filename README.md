@@ -15,9 +15,9 @@ StudyTracker is built as a cloud-native, decoupled multi-tier architecture with 
 
 ```mermaid
 flowchart TD
-    subgraph Client["Frontend Tier (Vite + React + TypeScript)"]
-        UI["React 19 SPA (Port 80 / 5173)"]
-        AuthContext["Auth Context (JWT / HttpOnly)"]
+    subgraph Client["Frontend Tier (Vite + React 19 + TypeScript)"]
+        UI["React SPA (Port 80 / 3000 / 5173)"]
+        AuthContext["Auth Context (Pure HTTP-Only Cookie Session)"]
         Charts["Chart.js Analytics & Visualizations"]
     end
 
@@ -26,10 +26,10 @@ flowchart TD
     end
 
     subgraph BackendTier["Backend Tier (Spring Boot 3.3.4 + Java 21)"]
-        Security["Spring Security (Stateless JWT + CSRF safe)"]
-        API["REST Controllers (OpenAPI / Swagger)"]
+        Security["Spring Security (HttpOnly SameSite=Strict Cookies)"]
+        API["15 REST Controllers (OpenAPI / Swagger)"]
         Services["Business Services (Task, DSA, Portability)"]
-        Flyway["Flyway Migration Engine"]
+        Flyway["Flyway Migration Engine (V1, V2)"]
         AiService["AI Assistant Service (Hints-First Engine)"]
     end
 
@@ -56,176 +56,134 @@ flowchart TD
 
 ---
 
-## ⚡ Quick Start: Run with Docker Compose (Recommended)
+## 🔒 Authentication & Security Architecture
 
-The entire full-stack application (PostgreSQL, Spring Boot backend, and React/Nginx frontend) starts with **a single command**:
+1. **Pure HTTP-Only Cookie Authentication**:
+   - Authentication tokens are **never stored in `localStorage`**.
+   - On `/api/v1/auth/login` or `/api/v1/auth/register`, Spring Boot sets an HTTP-only `ResponseCookie`:
+     - `HttpOnly = true` (inaccessible to JavaScript, immune to XSS token theft)
+     - `SameSite = Strict` (defense against CSRF attacks)
+     - `Secure = true` in production (transmitted exclusively over HTTPS)
+     - `Path = /`
+   - Frontend `fetch` requests include `credentials: 'include'`.
+   - On `/api/v1/auth/logout`, the server expires the cookie with `maxAge = 0`.
+2. **Demo Account Hardening**:
+   - Demo-account auto-initialization is **disabled by default** (`DEMO_ACCOUNT_ENABLED=false`).
+   - Insecure hardcoded passwords (e.g. `password123`) have been eliminated.
+   - For local development, demo account creation can be enabled by setting `DEMO_ACCOUNT_ENABLED=true` and supplying a custom password via `DEMO_ACCOUNT_PASSWORD`.
+   - Passwords are never logged.
+3. **Strict User Ownership Isolation**:
+   - Queries enforce ownership at the service layer by `ownerId`.
+   - Modifying or deleting another user's resources results in an immediate `404 Not Found`.
+
+---
+
+## ⚡ Running with Docker Compose
+
+The complete full-stack stack (PostgreSQL, Spring Boot backend, and React/Nginx frontend) is configured for containerized execution:
 
 ```bash
 docker compose up --build
 ```
 
-Once running:
-- **Web Application:** [http://localhost](http://localhost) (or [http://localhost:3000](http://localhost:3000))
+- **Web Application:** [http://localhost](http://localhost) or [http://localhost:3000](http://localhost:3000)
 - **Backend API & Swagger UI:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 - **Actuator Health Check:** [http://localhost:8080/actuator/health](http://localhost:8080/actuator/health)
 
-### Demo Account (Pre-Seeded)
-The application automatically seeds a demo account on first run:
-- **Username:** `jayasuriya`
-- **Password:** `password123`
-- *Note: You can also click the "Fill Demo Credentials" button on the login screen or register an entirely new account.*
+> [!NOTE]
+> *Environment Status:* Docker configuration was created, but runtime verification was not performed because Docker is unavailable in this environment. The Docker compose configuration and builds are automated and verified via GitHub Actions CI.
 
 ---
 
 ## 💻 Non-Docker Local Development Setup
 
-If you wish to develop frontend and backend separately without Docker:
-
 ### 1. Prerequisites
-- **Java 21 JDK** (Temurin or OpenJDK 21)
+- **Java 21 JDK** (Eclipse Temurin or OpenJDK 21)
 - **Node.js 20+** and **npm 10+**
-- **PostgreSQL 15+** running locally (or H2 in-memory for testing)
+- **PostgreSQL 15+** running locally (or test environment)
 
-### 2. Backend Setup
-1. Configure environment variables in `.env` (or pass via terminal):
-   ```bash
-   cd backend
-   ```
-2. Build and run tests:
-   ```bash
-   ./mvnw clean test
-   ```
-3. Start the Spring Boot server:
-   ```bash
-   ./mvnw spring-boot:run
-   ```
-   *The backend starts at `http://localhost:8080` and connects to PostgreSQL (falling back to H2 for automated tests).*
+### 2. Backend Setup (Spring Boot 3.3.4 + Java 21)
+```bash
+cd backend
 
-### 3. Frontend Setup
-1. Navigate to `frontend/`:
-   ```bash
-   cd frontend
-   npm install
-   ```
-2. Start the Vite development server with proxy:
-   ```bash
-   npm run dev
-   ```
-   *Access the frontend at `http://localhost:5173`. Requests to `/api/` are automatically proxied to `http://localhost:8080`.*
+# On Windows:
+.\mvnw.cmd clean test
+.\mvnw.cmd spring-boot:run
 
----
-
-## 🌟 Core Features & Modules
-
-### 1. 52-Week Transition Curriculum (Nov 2026 – Oct 2027)
-- **7 Phased Milestones (Phase A through G)**:
-  - **Phase A (Weeks 1–8):** Core Engineering Foundations, Concurrency, Git, & AI-Assisted Fluency.
-  - **Phase B (Weeks 9–16):** Java 21 Deep Dive, Spring Boot Architecture, SQL Optimization, & Redis.
-  - **Phase C (Weeks 17–24):** Enterprise Microservices, Secure REST APIs, & Synthetic Banking Defect Resolution.
-  - **Phase D (Weeks 25–32):** Flagship AI Credit Copilot (Spring AI, RAG, pgvector, Keycloak OAuth2).
-  - **Phase E (Weeks 33–40):** Application Security, OWASP Top 10, DevSecOps CI/CD Pipelines, & Threat Modeling.
-  - **Phase F (Weeks 41–48):** Product-Company Applications, High-Level System Design, & Mock Interviews.
-  - **Phase G (Weeks 49–52):** Offer Negotiations, Comp Benchmarking (₹30–40 LPA), & Transition Finalization.
-- **260 Granular Seeded Tasks**: Check off deliverables, add custom tasks, and carry forward unfinished tasks between weeks.
-- **Pre-Start Countdown**: Live countdown until the 2 November 2026 kick-off.
-
-### 2. Deep Work Study Timer & Ledger
-- Live stopwatch widget with task association and distraction notes.
-- Offline session logger for manual entry.
-- Historical ledger measuring consistency toward the 14h/week target.
-
-### 3. DSA Problem Tracker (Target: 120–160 Problems)
-- Categorized by algorithmic pattern (Two Pointers, Sliding Window, Trees, Graphs, DP, Intervals).
-- Spaced-repetition revision queue to revisit challenging problems.
-- Time & space complexity logging with confidence scores.
-
-### 4. Weekly Reflection & Verification Journal
-- Structured around the 4 core prompts:
-  1. *What was studied and built?*
-  2. *What did AI get right?*
-  3. *What did AI get wrong? (Hallucinations, bugs, antipatterns)*
-  4. *What was verified independently through tests and documentation?*
-- Draft and Finalized modes with hours auto-calculation.
-
-### 5. Synthetic Portfolio Projects (Zero Confidential Data)
-- **Flagship Project:** *Secure Enterprise Credit Copilot* (Spring Boot, Spring AI, pgvector, Keycloak, synthetic corporate loan evaluations).
-- **Secondary Project 1:** *Flutter DevSecOps Defect Telemetry* (OWASP Mobile Top 10, SonarQube, defect triage).
-- **Secondary Project 2:** *Cloud-Native API Security Gateway* (Rate limiting, Vault secret management, JWT validation).
-- *Strict adherence to confidentiality: Zero TCS, Commercial Bank of Dubai, or WCAS proprietary data.*
-
-### 6. Career Application Pipeline & Mock Interviews
-- Compensation ambition tracker: ₹30–40 LPA breakdown (Base, Bonus, ESOPs).
-- Kanban pipeline: Wishlist ➔ Applied ➔ Screening ➔ Tech Round ➔ System Design ➔ Offer.
-- Mock interview logger with evaluation ratings (1–10) and feedback.
-
-### 7. Performance & Velocity Analytics (Chart.js)
-- Weekly effort velocity vs 14h target.
-- Time distribution across engineering pillars (DSA, Java, AI, AppSec).
-- Phase completion percentages and DSA pattern coverage.
-
-### 8. Educational AI Study Coach
-- **Hints-First Mode:** Socratic hints that teach problem-solving without giving away raw solutions.
-- **Quiz & Mock Interview Modes:** Tests conceptual understanding and system design trade-offs.
-- **Mandatory Verification Advisory:** Clear notices on every response reminding that AI can hallucinate.
-- **Output Rating:** Grade AI responses as *Verified Correct*, *Partially Correct*, or *Bug/Hallucination*.
-- **Provider Agnostic:** Supports `MOCK` (built-in offline provider), `OPENAI` (cloud API), or `OLLAMA` (local LLM).
-
-### 9. Complete Data Portability
-- 1-click JSON backup export and restore.
-- CSV exports for study sessions and DSA records.
-
----
-
-## 🔒 Security & Privacy
-
-- **User Data Isolation:** Queries explicitly filter by `userId` to prevent IDOR vulnerabilities.
-- **Password Hashing:** BCrypt with strong salt rounds.
-- **Authentication:** Stateless JWT with support for `HttpOnly`, `SameSite=Strict` cookies.
-- **Prompt Injection Defense:** Input sanitation filtering adversarial override tokens.
-- For more details, consult [SECURITY.md](SECURITY.md).
-
----
-
-## 📂 Repository Structure
-
+# On Linux/macOS:
+./mvnw clean test
+./mvnw spring-boot:run
 ```
-├── backend/                   # Spring Boot 3.3.4 (Java 21) REST Backend
-│   ├── src/main/java/         # Controllers, Services, Repositories, Entities
-│   ├── src/main/resources/    # Flyway Migrations (V1, V2), configs
-│   ├── Dockerfile             # Multi-stage Eclipse Temurin build
-│   └── pom.xml
-├── frontend/                  # React + TypeScript + Vite SPA
-│   ├── src/components/        # Reusable UI components & Timer Widget
-│   ├── src/pages/             # 12 modular application pages
-│   ├── src/services/          # Typed API client
-│   ├── Dockerfile             # Multi-stage Node + Nginx Alpine build
-│   └── nginx.conf             # SPA routing & API reverse proxy
-├── legacy-static/             # Archived original static HTML/JS files
-├── docker-compose.yml         # Containerized production stack
-├── .env.example               # Safe configuration template
-├── SECURITY.md                # Security policy & threat model
-└── README.md                  # Project documentation
+*Backend runs on `http://localhost:8080`.*
+
+### 3. Frontend Setup (React 19 + TypeScript + Vite)
+```bash
+cd frontend
+npm ci
+npm run lint
+npm test -- --run
+npm run build
+npm run dev
 ```
+*Frontend runs on `http://localhost:5173`. Requests to `/api/` are automatically proxied to `http://localhost:8080`.*
+
+---
+
+## 🌟 Modules & Working REST Controllers
+
+| Module | Controller | Base Path | Endpoints |
+|---|---|---|---|
+| **Authentication** | `AuthController` | `/api/v1/auth` | `/register`, `/login`, `/logout`, `/me`, `/profile` |
+| **Curriculum** | `RoadmapController` | `/api/v1` | `/roadmap`, `/weeks`, `/weeks/{weekNumber}` |
+| **Tasks** | `TaskController` | `/api/v1/tasks` | `POST /`, `PUT /{id}`, `PATCH /{id}/toggle`, `DELETE /{id}`, `POST /{id}/carry-forward` |
+| **Study Sessions** | `StudySessionController` | `/api/v1/sessions` | `POST /`, `GET /`, `GET /stats` |
+| **DSA Tracker** | `DsaController` | `/api/v1/dsa` | `POST /`, `PUT /{id}`, `DELETE /{id}`, `GET /`, `GET /stats`, `GET /revision-queue` |
+| **Weekly Reviews** | `WeeklyReviewController` | `/api/v1/reviews` | `GET /{weekId}`, `POST /` |
+| **Projects** | `ProjectController` | `/api/v1/projects` | `GET /`, `POST /`, `PUT /{id}`, `POST /{id}/milestones`, `PATCH /milestones/{id}/toggle` |
+| **Career Pipeline** | `CareerController` | `/api/v1/career` | `GET /applications`, `POST /applications`, `PUT /applications/{id}`, `DELETE /applications/{id}`, `GET /interviews`, `POST /interviews` |
+| **Dashboard** | `DashboardController` | `/api/v1/dashboard` | `GET /` (metrics, countdown, focus) |
+| **Analytics** | `AnalyticsController` | `/api/v1/analytics` | `GET /` (velocity charts, hours by category, funnel) |
+| **Search** | `SearchController` | `/api/v1/search` | `GET /?q={keyword}` (PostgreSQL unified search) |
+| **Portability** | `DataPortabilityController` | `/api/v1/portability` | `/export/json`, `/import/json`, `/export/sessions/csv`, `/export/dsa/csv` |
+| **AI Coach** | `AiController` | `/api/v1/ai` | `/status`, `/chat`, `/messages/{id}/rate` |
+| **Resources** | `LearningResourceController` | `/api/v1/resources` | `GET /`, `POST /` |
+| **Notifications** | `NotificationController` | `/api/v1/notifications` | `GET /`, `PATCH /{id}/read` |
+
+---
+
+## 🤖 Educational AI Assistant Guardrails
+
+- **Hints-First Pedagogy**: Socratic hints that guide learning without spoon-feeding answers.
+- **Dedicated Modes**: `HINTS_FIRST`, `QUIZ`, `MOCK_INTERVIEW`, `EXPLAIN`.
+- **Mandatory Output Notice**: Visible notice on every response warning of potential hallucinations.
+- **Independent Verification Rating**: Grade responses as *Verified Correct*, *Partially Correct*, or *Bug/Hallucination*.
+- **Provider Agnostic**: Supports `MOCK` (zero-cost offline), `OPENAI`, or `OLLAMA`.
+- *Note: Vector embeddings (pgvector) and document RAG chunking are architected for future phase expansion; the current assistant operates via provider abstraction and context injection.*
 
 ---
 
 ## 🧪 Automated Testing
 
-### Backend Unit & Integration Tests
+### Backend (JUnit 5 + Testcontainers)
 ```bash
 cd backend
 ./mvnw clean test
 ```
-Validates:
-- User authentication and data isolation.
-- Phase completion and percentage calculations.
-- AI assistant prompts and prompt injection sanitization.
-- Task status toggles and milestone tracking.
+Tests:
+- `RoadmapTimelineCalculatorTests` (5 edge cases: before start, exact start, mid-roadmap, exact end, after end).
+- `RoadmapSeedDataValidationTests` (Validates 7 phases, 52 unique weeks, Nov 2 2026 – Oct 31 2027, seed tasks).
+- `AuthAndIsolationApiTests` (Validates strict user data isolation).
+- `RoadmapCalculationTests` (Phase completion formulas).
+- `TaskServiceTests` (Task toggle and carry-forward).
+- `AiAssistantTests` (Rate limits and prompt injection sanitization).
+- `PostgreSqlIntegrationTests` (`@Testcontainers(disabledWithoutDocker = true)` for real PostgreSQL integration).
 
-### Frontend Typechecking & Build
+### Frontend (Vitest + Oxlint)
 ```bash
 cd frontend
-npm run build
+npm run lint          # Oxlint static analysis
+npm test -- --run     # Vitest unit tests
+npm run build         # Vite production build
 ```
 
 ---

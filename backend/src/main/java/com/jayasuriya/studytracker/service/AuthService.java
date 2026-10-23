@@ -15,6 +15,8 @@ import java.time.LocalDate;
 @Service
 public class AuthService {
 
+    public record LoginResult(String token, UserDto user) {}
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
@@ -32,7 +34,7 @@ public class AuthService {
     }
 
     @Transactional
-    public AuthResponse register(RegisterRequest req) {
+    public LoginResult register(RegisterRequest req) {
         if (userRepository.existsByUsername(req.username())) {
             throw new BadRequestException("Username is already taken");
         }
@@ -55,10 +57,10 @@ public class AuthService {
         roadmapService.initializeUserRoadmap(user);
 
         String token = jwtUtils.generateToken(user.getUsername(), user.getId(), user.getRole());
-        return new AuthResponse(token, toDto(user));
+        return new LoginResult(token, toDto(user));
     }
 
-    public AuthResponse login(LoginRequest req) {
+    public LoginResult login(LoginRequest req) {
         User user = userRepository.findByUsername(req.username())
                 .or(() -> userRepository.findByEmail(req.username()))
                 .orElseThrow(() -> new UnauthorizedException("Invalid username or password"));
@@ -68,7 +70,7 @@ public class AuthService {
         }
 
         String token = jwtUtils.generateToken(user.getUsername(), user.getId(), user.getRole());
-        return new AuthResponse(token, toDto(user));
+        return new LoginResult(token, toDto(user));
     }
 
     public UserDto getCurrentUserDto(User user) {

@@ -3,15 +3,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../services/api';
 import { useToast } from '../components/Toast';
 import {
-  Bot,
   Send,
-  Sparkles,
   AlertTriangle,
-  CheckCircle2,
-  HelpCircle,
-  ThumbsUp,
-  ThumbsDown,
-  RotateCcw,
   ShieldAlert,
 } from 'lucide-react';
 import { VerificationRating } from '../types';
@@ -31,13 +24,13 @@ export const AiAssistantPage: React.FC = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [activeMode, setActiveMode] = useState<string>('HINTS_FIRST');
   const [conversationId, setConversationId] = useState<number | undefined>(undefined);
-  const [messages, setMessages] = useState<ChatMessage[]>([
+  const [messages, setMessages] = useState<ChatMessage[]>(() => [
     {
       id: 0,
       sender: 'ASSISTANT',
       content:
         "Hello Jayasuriya! I am your AI Study Coach. I operate in **Hints-First mode** by default to help you develop independent problem-solving skills rather than copying code. How can I assist your Java, Spring Boot, DSA, or AppSec preparation today?",
-      createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      createdAt: '00:00',
     },
   ]);
 

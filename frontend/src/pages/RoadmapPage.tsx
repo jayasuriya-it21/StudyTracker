@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
-import { Calendar, CheckCircle2, Clock, Filter, ArrowRight, BookOpen, Layers } from 'lucide-react';
+import { Calendar, CheckCircle2, Clock, ArrowRight } from 'lucide-react';
 
 export const RoadmapPage: React.FC = () => {
   const navigate = useNavigate();
